@@ -1,0 +1,24 @@
+{
+  "reference": "https://robin.etherscan.io/address/0x5Eb87F69bE00Df39981622Fd60A8De4b7837e080#code",
+  "generated_by": "Executing verified CalendarLib + SessionLib in an isolated Foundry harness; not generated from Ramp code",
+  "solc": "0.8.26",
+  "columns": [
+    "timestamp",
+    "profile",
+    "session",
+    "feeFloor"
+  ],
+  "profiles": [
+    "NVDA default",
+    "SPY no descent",
+    "GLD no descent",
+    "NVDA Jan7 forced closed Jan10 forced open Jan9 early close 13:00 EST",
+    "profile3 with closeBefore=21600"
+  ],
+  "vector_count": 6740,
+  "sha256": "88cb80e579fb7ec1ac6d4e6274b148c69c2026a9766369c04ed4adb13f223868",
+  "reference_source_sha256": {
+    "SessionLib.sol": "d36010e9d934919f2a3b3a13112ade2894ebac436bf0e60321e46e9b2ceee01d",
+    "CalendarLib.sol": "e2d33377f7ceadac9e5c9b16fc4221cca6bc0ee37799abe78dab58470a85c1de"
+  }
+}

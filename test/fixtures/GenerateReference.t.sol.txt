@@ -1,0 +1,48 @@
+pragma solidity ^0.8.26;
+import {Test} from "forge-std/Test.sol";
+import {SessionLib} from "../src/SessionLib.sol";
+import {CalendarLib} from "../src/CalendarLib.sol";
+contract Generate is Test {
+    mapping(uint256 => uint64) overrides;
+    mapping(uint256 => uint32) early;
+    function test_generateReferenceVectors() public {
+        // Six points per local weekday/holiday plus every DST boundary and randomized samples.
+        uint256[] memory points = new uint256[](2000);
+        uint256 count;
+        for(uint256 y=2026;y<=2030;y++) {
+            for(uint256 m=1;m<=12;m++) {
+                for(uint256 d=1;d<=28;d+=3) {
+                    uint256 utc = SessionLib.dayFromCivil(y,m,d)*86400;
+                    points[count++] = utc + 14 hours + 30 minutes;
+                    points[count++] = utc + 21 hours;
+                }
+            }
+        }
+        uint256[9] memory offsets = [uint256(0), 34200, 34201, 36000, 46800, 55800, 57600, 59400, 86399];
+        for(uint256 d=1;d<=12;d++) for(uint256 k;k<offsets.length;k++)
+            points[count++] = SessionLib.dayFromCivil(2026,1,d)*86400+5 hours+offsets[k];
+        for(uint256 y=2026;y<=2030;y++) for(uint256 month=3;month<=11;month+=8) {
+            uint256 sunday=month==3 ? 8+(7-SessionLib.dayOfWeek(SessionLib.dayFromCivil(y,3,1)))%7
+                :1+(7-SessionLib.dayOfWeek(SessionLib.dayFromCivil(y,11,1)))%7;
+            uint256 t=SessionLib.dayFromCivil(y,month,sunday)*86400;
+            points[count++]=t-1;points[count++]=t;points[count++]=t+6 hours;points[count++]=t+7 hours;
+        }
+        uint256[] memory data = new uint256[](count*5*4);
+        uint256 cursor;
+        for(uint256 profile;profile<5;profile++) {
+            overrides[202601] = profile>=3 ? (uint64(1)<<12)|(uint64(2)<<18) : 0;
+            early[20260109] = profile>=3 ? 46800 : 0;
+            SessionLib.FloorConfig memory c=SessionLib.FloorConfig(1000,800,300,5,4000,7200,2200,1800,1800);
+            if(profile==1)c=SessionLib.FloorConfig(800,500,250,0,0,0,0,0,0);
+            if(profile==2)c=SessionLib.FloorConfig(2500,2500,6000,0,0,0,0,0,0);
+            if(profile==4)c.closeBefore=21600;
+            for(uint256 i;i<count;i++) {
+                data[cursor++]=points[i];data[cursor++]=profile;
+                data[cursor++]=uint256(CalendarLib.sessionAt(overrides,early,34200,57600,SessionLib.DstMode.AUTO,points[i]));
+                data[cursor++]=CalendarLib.feeFloorAt(overrides,early,34200,57600,SessionLib.DstMode.AUTO,c,points[i]);
+            }
+        }
+        string memory json=vm.serializeUint("reference","vectors",data);
+        vm.writeJson(json,"/tmp/fables-calendar-vectors.json");
+    }
+}

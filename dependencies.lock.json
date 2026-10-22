@@ -1,0 +1,22 @@
+{
+  "format_version": 1,
+  "dependencies": [
+    {
+      "path": "lib/forge-std",
+      "url": "https://github.com/foundry-rs/forge-std.git",
+      "commit": "972a5cfe2a4b5c0cf5e2ff171165992719a704b9"
+    },
+    {
+      "path": "lib/v4-core",
+      "url": "https://github.com/Uniswap/v4-core.git",
+      "commit": "46c6834698c48bc4a463a86d8420f4eb1d7f3b75"
+    },
+    {
+      "path": "lib/v4-periphery",
+      "url": "https://github.com/Uniswap/v4-periphery.git",
+      "commit": "9969eec44cfdf07e24b41de47f40276a58401976"
+    }
+  ],
+  "nested_dependencies": "Each parent commit pins its child submodules; restore recursively.",
+  "provenance": "All upstream tracked files, including recursive submodules, match the original local dependency copies. See README.md for provenance."
+}
